@@ -17,8 +17,8 @@ data1=data.split(',')
 content_str=content_str+'*'+data1[0]+'*'+data1[1].strip()
 
 #AUDIENCE SCORE
-data=bs.find('div',{'class':'thumbnail-scoreboard-wrap'}).findChildren()
-content_str=content_str+'*'+data[4].attrs['audiencescore']
+data=bs.find('score-board')
+content_str=content_str+'*'+data.attrs['audiencescore']
 #storyline
 data=bs.find('div',{'id':'movieSynopsis'}).get_text().strip('\n')
 content_str=content_str+'*'+data.strip()
