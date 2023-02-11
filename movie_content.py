@@ -7,37 +7,31 @@ html = urlopen(url)
 bs = BeautifulSoup(html.read(),'html.parser')
 data=bs.find_all('h1')
 movie=[]
+content_str=''
 title=data[0].get_text()
-movie.append({
-    'title':title
-})
+content_str=content_str+title
 
+#year and movie type
 data=bs.find('p',{'class':'scoreboard__info'}).get_text()
-movie.append({
-    'year':data[0],
-    'type':data[1]
-})
+data1=data.split(',')
+content_str=content_str+'*'+data1[0]+'*'+data1[1].strip()
 
 #AUDIENCE SCORE
 data=bs.find('div',{'class':'thumbnail-scoreboard-wrap'}).findChildren()
-movie.append({
-    'audiencescore':data[4].attrs['audiencescore']
-})
+content_str=content_str+'*'+data[4].attrs['audiencescore']
 #storyline
-data=bs.find('div',{'id':'movieSynopsis'}).get_text()
-movie.append({
-    'story':data.strip('\n').strip()
-})
-#stars
+data=bs.find('div',{'id':'movieSynopsis'}).get_text().strip('\n')
+content_str=content_str+'*'+data.strip()
+# stars
 stars=bs.find_all('div',{'class':'cast-item'})
+content_str=content_str+'*'
 for star in stars:
     starName=star.get_text().strip()
     if 'Unknown' in starName:
         continue
     else:
-        movie.append({
-            'star':starName[:20].strip()
-        }) 
+        content_str=content_str+' '+starName[:20].strip()
+movie=content_str.split('*')
 #save as json
 with open(f"Theater/{title}.json", "w", encoding="utf-8") as file:
     file.write(json.dumps(movie, ensure_ascii=False, indent=4))
