@@ -33,7 +33,7 @@ my_options.add_argument(f'--user-agent={ua.random}') # (Optional)加入 User-Age
 driver = webdriver.Chrome(options = my_options,service = Service(ChromeDriverManager().install()))
 import pandas as pd
 #in theaters
-path_list=pd.read_json('movies_in_theaters_109.json')
+path_list=pd.read_json('movies_athome_150.json')
 links=[]
 for path in path_list['path']:
     url = path
@@ -45,12 +45,41 @@ for path in path_list['path']:
     movie_pic=driver.find_element(By.CSS_SELECTOR,"img.posterImage").get_attribute('src')
     path=driver.current_url
     title=path[33:]
+    yeartypetime=driver.find_element(By.CSS_SELECTOR,"p.scoreboard__info").text
+    yeartypetime1=yeartypetime.split(',')
+    lengtgh=len(yeartypetime1)
+    if(lengtgh==3):
+        year=yeartypetime1[0]
+        type=yeartypetime1[1]
+        howlong=yeartypetime1[2]
+    if(lengtgh==2):
+        year=yeartypetime1[0]
+        type=yeartypetime1[1]
+        howlong=''
+    if(lengtgh==1):
+        year=yeartypetime1[0]
+        type=''
+        howlong=''
+    score=driver.find_element(By.TAG_NAME,"score-board").get_attribute('audiencescore')
+    story=driver.find_element(By.CSS_SELECTOR,"div#movieSynopsis").text.strip("\n")
+    stars=driver.find_elements(By.CSS_SELECTOR,"div.cast-item")
+    starlist=[]
+    for star in stars:
+        starlist.append(star.text)
+    starlist1=" ".join(starlist)
     links.append({
         'title':title,
         'path':path,
+        'year':year,
+        'type':type,
+        'howlong':howlong,
+        'score':score,
+        'story':story,
+        'stars':starlist1,
         'pic':movie_pic
+        
     })
 driver.close()
 # 寫入 書籍資訊 in json 檔
-with open('test.json', "w", encoding="utf-8") as file:
+with open('movies_athome_150.json', "w", encoding="utf-8") as file:
     file.write(json.dumps(links, ensure_ascii=False, indent=4))
